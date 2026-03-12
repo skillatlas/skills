@@ -85,6 +85,8 @@ type RunSkills = (args: string[], options?: { quiet?: boolean }) => Promise<void
 
 const REGISTRY_VERSION = 1;
 const SCHEDULER_NAME = "skillatlas-auto-update";
+const SCHEDULER_INTERVAL_HOURS = 6;
+const SCHEDULER_INTERVAL_SECONDS = SCHEDULER_INTERVAL_HOURS * 60 * 60;
 const SCHEDULED_LOCK_MAX_AGE_MS = 1000 * 60 * 60 * 24;
 const AUTO_DETECTED_AGENTS = [
   { id: "claude-code", marker: path.join(homedir(), ".claude") },
@@ -593,7 +595,7 @@ async function installMacScheduler(): Promise<void> {
     <string>${command}</string>
   </array>
   <key>StartInterval</key>
-  <integer>43200</integer>
+  <integer>${SCHEDULER_INTERVAL_SECONDS}</integer>
   <key>StandardOutPath</key>
   <string>${logPath}</string>
   <key>StandardErrorPath</key>
@@ -635,11 +637,11 @@ Type=oneshot
 ExecStart=/bin/sh -lc '${getSchedulerCommand()}'
 `;
   const timer = `[Unit]
-Description=Run Skill Atlas auto-update every 12 hours
+Description=Run Skill Atlas auto-update every ${SCHEDULER_INTERVAL_HOURS} hours
 
 [Timer]
 OnBootSec=5m
-OnUnitActiveSec=12h
+OnUnitActiveSec=${SCHEDULER_INTERVAL_HOURS}h
 RandomizedDelaySec=5m
 Unit=${SCHEDULER_NAME}.service
 
@@ -685,7 +687,7 @@ async function installWindowsScheduler(): Promise<void> {
       "/SC",
       "HOURLY",
       "/MO",
-      "12",
+      String(SCHEDULER_INTERVAL_HOURS),
       "/TR",
       `cmd /c ${getSchedulerCommand()}`,
     ],
@@ -718,6 +720,30 @@ async function getSchedulerStatus(): Promise<SchedulerStatus> {
   }
 }
 
+async function ensureSchedulerInstalled(): Promise<boolean> {
+  const status = await getSchedulerStatus();
+
+  if (status.installed) {
+    return false;
+  }
+
+  switch (platform()) {
+    case "darwin":
+      await installMacScheduler();
+      break;
+    case "linux":
+      await installLinuxScheduler();
+      break;
+    case "win32":
+      await installWindowsScheduler();
+      break;
+    default:
+      throw new Error(`Scheduler is not supported on ${platform()}`);
+  }
+
+  return true;
+}
+
 export async function runManagedInstall(args: string[], runSkills: RunSkills): Promise<void> {
   const parsed = parseInstallOptions(args);
   const agents = await ensureSelectedAgents(parsed.agents);
@@ -731,6 +757,14 @@ export async function runManagedInstall(args: string[], runSkills: RunSkills): P
   await writeRegistry(replaceInstallEntry(registry, nextEntry));
   await ensureParentDir(SETTINGS_PATH);
   await writeFile(SETTINGS_PATH, `${JSON.stringify({ sourceRepo: MANAGED_SKILL_REPO }, null, 2)}\n`, "utf8");
+
+  if (parsed.autoUpdate) {
+    const installedScheduler = await ensureSchedulerInstalled();
+
+    if (installedScheduler) {
+      console.log("Installed scheduler for auto-update.");
+    }
+  }
 
   console.log(`Tracked Skill Atlas install for ${formatScope(parsed.scope)} (${agents.selected.join(", ")})`);
 }

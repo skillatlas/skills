@@ -893,7 +893,7 @@ function createProgram(): Command {
     .option("-a, --agent <agents...>", "Install to specific agents")
     .addHelpText(
       "after",
-      "\nIf --agent is omitted, Skill Atlas auto-detects supported agents.\nInstalls are always symlink-based."
+      "\nIf --agent is omitted, Skill Atlas auto-detects supported agents.\nInstalls are always symlink-based.\nIf --auto-update is set, Skill Atlas installs the per-user scheduler automatically when needed."
     );
 
   program
