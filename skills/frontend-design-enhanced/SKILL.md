@@ -1,5 +1,5 @@
 ---
-name: frontend-design
+name: frontend-design-enhanced
 description: Design and implement distinctive, production-ready frontend interfaces for the web. Use when building, redesigning, or polishing components, pages, dashboards, landing pages, design systems, or UI code (HTML/CSS/JS/TS/React/Vue/Tailwind) that must be beautiful, usable, responsive, accessible, and feel deliberately designed rather than generic.
 compatibility: Best in coding agents that can inspect and edit existing frontend files and follow local framework conventions. Avoid introducing new dependencies unless they are clearly justified.
 license: MIT

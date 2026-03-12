@@ -1,12 +1,12 @@
 ---
-name: movie-poster-graphics
+name: movie-poster-style-image-generation
 description: Create generative movie-poster style graphics for products, apps, brands, campaigns, and abstract concepts. Use when a task needs poster-quality key art, archetype selection, title treatment guidance, or strong prompting for an image model.
 license: MIT
 prerequisites:
   - OpenRouter API key
 metadata:
   author: Skill Atlas
-  version: "0.1.0"
+  version: "0.1.1"
   homepage: https://skillatlas.sh/
 ---
 
@@ -22,7 +22,7 @@ The goal is not just to make a nice image. The goal is to make an image that rea
 
 This skill is **tool-agnostic**. Use whatever image generation service is available in the environment.
 
-If the agent has OpenRouter access but no better wrapper, **`npx minibanana`** is a good option.
+If the agent has OpenRouter access but no better wrapper, **`npx minibanana@0.1.0`** is a good option.
 
 Unless the user specifies a model, good defaults are:
 
@@ -63,6 +63,8 @@ Optional variables the agent may infer or add:
 
 If the user does not provide a title or tagline, infer a sensible one from the concept.
 
+**Note:** `[CONCEPT_DESCRIPTION]`, `[TITLE]`, and `[TAGLINE]` are not raw external input — they are authored by the agent itself based on the user's request. The agent interprets what the user wants, runs the creative gauntlet, and writes these values. They are never passed through from untrusted sources.
+
 ## Core approach
 
 Do not prompt with generic keyword soup.
@@ -82,7 +84,7 @@ A strong poster usually has **one big visual idea**.
 
 The biggest risk in poster design is being predictable. An AI coding tool gets a poster with a glowing terminal. A security product gets a shield. A speed product gets lightning bolts. These are **dead on arrival** — they're the visual equivalent of clip art.
 
-The first idea you think of is the first idea *everyone* thinks of. It is a cliché. But the problem is deeper than that: the *second* idea is often just the first idea wearing a hat. You need to push past the gravitational pull of the obvious multiple times before you reach something genuinely interesting.
+The first idea you think of is the first idea _everyone_ thinks of. It is a cliché. But the problem is deeper than that: the _second_ idea is often just the first idea wearing a hat. You need to push past the gravitational pull of the obvious multiple times before you reach something genuinely interesting.
 
 Every poster job **must** go through this full process before any prompt is written. **All steps must be written out explicitly** — do not skip ahead, do not do this silently.
 
@@ -154,7 +156,7 @@ You now have two live candidates (the second and third concepts). Evaluate them 
 
 **Pick the strongest.** If one clearly wins, use it.
 
-If neither fully satisfies you — if both have strengths but neither is *the one* — you have one more move: create a **fourth and final concept**. This can be:
+If neither fully satisfies you — if both have strengths but neither is _the one_ — you have one more move: create a **fourth and final concept**. This can be:
 
 - A completely fresh idea informed by everything you've rejected
 - A synthesis that combines the strongest elements from Rounds 2 and 3
@@ -316,12 +318,14 @@ It is fine to use poster-style reference cues such as **Hollywood blockbuster**,
 
 Use the image tool or API already available in the environment.
 
-If needed, `npx minibanana` is a practical OpenRouter option.
+All shell commands in this skill run through the host environment's standard tool-approval flow — the user must approve each command before it executes.
+
+If needed, `npx minibanana@0.1.0` is a practical OpenRouter option.
 
 Example:
 
 ```bash
-npx minibanana --model "<available-model-id>" --prompt @poster-prompt.md --out poster.png
+npx minibanana@0.1.0 --model "<available-model-id>" --prompt @poster-prompt.md --out poster.png
 ```
 
 Model IDs vary by provider and environment.
@@ -332,10 +336,10 @@ When the output needs more than one aspect ratio of the same poster (e.g. a 9:16
 
 ```bash
 # 1. Generate the primary poster
-npx minibanana --model "google/gemini-3-pro-image-preview" --prompt @poster-prompt.md --out poster-9x16.png
+npx minibanana@0.1.0 --model "google/gemini-3-pro-image-preview" --prompt @poster-prompt.md --out poster-9x16.png
 
 # 2. Derive the square version from the primary
-npx minibanana --model "google/gemini-3-pro-image-preview" \
+npx minibanana@0.1.0 --model "google/gemini-3-pro-image-preview" \
   --in poster-9x16.png \
   --prompt "Reframe this poster as a 1:1 square image. Keep the same style, colors, and mood. Center the title text and keep it fully visible and legible. Crop or restructure the composition to fill the square frame — do not letterbox or add bars." \
   --out poster-1x1.png

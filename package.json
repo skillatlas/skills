@@ -13,8 +13,7 @@
     "skillatlas": "./dist/cli.js"
   },
   "files": [
-    "dist",
-    "skills"
+    "dist"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json"

@@ -4,13 +4,13 @@ description: Publish local directories to the web with the Pigeonscale CLI, incl
 license: MIT
 metadata:
   author: Pigeonscale
-  version: "0.1.0"
+  version: "0.1.1"
   homepage: https://pigeonscale.com/
 ---
 
 # Publish a folder
 
-Use the cloud provider for sites. Run the CLI as `pigeonscale ...`. If it is not installed globally, use `npx -y pigeonscale ...`.
+Use the cloud provider for sites. Run the CLI as `pigeonscale ...`. If it is not installed globally, use `npx -y pigeonscale@0.0.25 ...`.
 
 ## Local session and approval state
 

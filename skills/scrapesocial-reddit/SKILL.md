@@ -6,7 +6,7 @@ prerequisites:
   - Scrape Creators API key
 metadata:
   author: Skill Atlas
-  version: "0.1.0"
+  version: "0.1.1"
   homepage: https://skillatlas.sh/
 ---
 
@@ -23,27 +23,49 @@ Use this skill for Reddit discovery, content research, comment extraction, and a
 Install the CLI once:
 
 ```bash
-npm install -g scrapesocial
+npm install -g scrapesocial@0.1.0
 ```
 
 Make sure the CLI can authenticate:
 
 ```bash
-export SCRAPECREATORS_API_KEY=...
+export SCRAPECREATORS_API_KEY=<your-api-key>
 scrapesocial reddit search --query "site reliability"
 ```
 
+## How it works
+
+This skill uses the `scrapesocial` CLI (installed from [npm](https://www.npmjs.com/package/scrapesocial)) to query the Scrape Creators API. All requests are authenticated with your `SCRAPECREATORS_API_KEY` environment variable. The CLI sends search queries to the Scrape Creators API and returns Reddit content. No data is sent elsewhere. No data is stored locally beyond command output.
+
 ## Goal-led workflows
 
-| Goal                 | When to use this skill                                                                                                                                  | How to start                                                                                                                                       |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Lead generation      | Use it for demand-led prospecting and lead qualification by finding communities and posts that reveal active need. It is not a contact-export workflow. | Start with `reddit search`, then inspect strong matches with `reddit subreddits get` and `reddit posts comments`.                                  |
-| Influencer discovery | Use it to spot recurring experts, operators, or visible community voices rather than creator-style influencer lists.                                    | Start with `reddit search` or `reddit subreddits posts`, then inspect post and comment authors in the returned discussions.                        |
-| Brand monitoring     | Use it to watch brand mentions, subreddit conversations, and recurring complaints or praise.                                                            | Start with `reddit search` for brand terms, then move into `reddit subreddits posts` or `reddit posts comments` where the discussion is strongest. |
-| Competitor analysis  | Use it to compare competitor mentions, objections, community fit, and ad activity.                                                                      | Start with `reddit search` for each competitor, then add `reddit subreddits search` or `reddit ads search` when you need narrower coverage.        |
-| Content analytics    | Use it to understand which themes, titles, and discussion hooks create traction inside a subreddit.                                                     | Start with `reddit subreddits posts`, then use `reddit posts comments` on representative posts.                                                    |
-| Trend research       | Use it when you need fast, cross-community signal on emerging topics, questions, or pain points.                                                        | Start with `reddit search`, then validate which subreddits matter with `reddit subreddits get` and `reddit subreddits posts`.                      |
-| Audience analysis    | Use it for qualitative audience analysis from comments, repeated language, objections, and subreddit norms.                                             | Start with `reddit posts comments` on strong threads or `reddit subreddits search` for topic-specific community language.                          |
+### Lead generation
+
+Use it for demand-led prospecting and lead qualification by finding communities and posts that reveal active need. It is not a contact-export workflow. Start with `reddit search`, then inspect strong matches with `reddit subreddits get` and `reddit posts comments`.
+
+### Influencer discovery
+
+Use it to spot recurring experts, operators, or visible community voices rather than creator-style influencer lists. Start with `reddit search` or `reddit subreddits posts`, then inspect post and comment authors in the returned discussions.
+
+### Brand monitoring
+
+Use it to watch brand mentions, subreddit conversations, and recurring complaints or praise. Start with `reddit search` for brand terms, then move into `reddit subreddits posts` or `reddit posts comments` where the discussion is strongest.
+
+### Competitor analysis
+
+Use it to compare competitor mentions, objections, community fit, and ad activity. Start with `reddit search` for each competitor, then add `reddit subreddits search` or `reddit ads search` when you need narrower coverage.
+
+### Content analytics
+
+Use it to understand which themes, titles, and discussion hooks create traction inside a subreddit. Start with `reddit subreddits posts`, then use `reddit posts comments` on representative posts.
+
+### Trend research
+
+Use it when you need fast, cross-community signal on emerging topics, questions, or pain points. Start with `reddit search`, then validate which subreddits matter with `reddit subreddits get` and `reddit subreddits posts`.
+
+### Audience analysis
+
+Use it for qualitative audience analysis from comments, repeated language, objections, and subreddit norms. Start with `reddit posts comments` on strong threads or `reddit subreddits search` for topic-specific community language.
 
 ## Command selection
 

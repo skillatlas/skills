@@ -223,6 +223,8 @@ os.system(f"cmd {user_input}")     # Command injection
 
 ### Always Flag (Secrets)
 
+**IMPORTANT: Never reproduce actual secret values in your output.** Show the variable name and a masked placeholder (e.g., `api_key = "sk-****"`) so the finding is clear without echoing the credential.
+
 ```
 password = "hardcoded"
 api_key = "sk-..."
@@ -277,7 +279,7 @@ random.random() for token            # FLAG: Security tokens need secrets module
 - **Impact**: [What an attacker could do]
 - **Evidence**:
   ```python
-  [Vulnerable code snippet]
+  [Vulnerable code snippet — REDACT secret values, show pattern only]
   ```
 ````
 

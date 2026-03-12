@@ -6,7 +6,7 @@ prerequisites:
   - Scrape Creators API key
 metadata:
   author: Skill Atlas
-  version: "0.1.0"
+  version: "0.1.1"
   homepage: https://skillatlas.sh/
 ---
 
