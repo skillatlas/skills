@@ -1,0 +1,121 @@
+---
+name: instant-agent-email-accounts-with-pigeonscale
+description: Create and use real Pigeonscale mailboxes for AI agents, including bootstrap mailbox creation with human approval, signed-in mailbox creation, sending and reading mail, inbox watching, and custom-domain mailbox setup. Use when an agent needs an email address, inbox, send/receive workflow, or mailbox approval flow through the Pigeonscale CLI.
+license: MIT
+metadata:
+  author: Pigeonscale
+  version: "0.1.0"
+  homepage: https://pigeonscale.com/
+---
+
+# Use the mail workflows correctly
+
+Use the cloud provider for these workflows. Run the CLI as `pigeonscale ...`. If it is not installed globally, use `npx -y pigeonscale ...`.
+
+## Local session and approval state
+
+Keep these paths in mind:
+
+- Session state lives in `~/.config/pigeonscale/session.json`.
+- Pending approvals live in `~/.config/pigeonscale/pending-approvals.json`.
+- Inspect pending approvals with `pigeonscale approvals status`.
+
+Token storage uses `cross-keychain`:
+
+- When a native credential backend exists, `session.json` is metadata-only and stores `baseUrl`, `accessTokenExpiresAtMs`, `tokenStorage: "keychain"`, and a deterministic `keychainAccount`.
+- In that case the actual `accessToken` and `refreshToken` live in the OS keychain under service `pigeonscale.session`.
+- When no native backend exists, the CLI falls back to writing both tokens into `session.json` with `0600` permissions.
+
+The CLI can exchange approved pending tokens on later cloud requests, but the deterministic path is still to rerun the original command unless the current command already succeeded.
+
+## Session approval
+
+Request a cloud session without creating a mailbox:
+
+```bash
+pigeonscale auth login --human owner@example.com
+```
+
+If output says `Approval required`, let the human approve it, then rerun the same `auth login` command. That exchanges the stored `pendingToken` for fresh access and refresh tokens.
+
+Treat session approval and mailbox approval as separate flows.
+
+## First mailbox: public bootstrap
+
+Prefer a public mailbox first. This is the fastest path and works while signed out.
+
+Create a public mailbox with a handle and display name:
+
+```bash
+pigeonscale mail accounts create \
+  --human owner@example.com \
+  --handle henry \
+  --from-name "Henry the Agent"
+```
+
+If already signed in with `pigeonscale auth login --human owner@example.com`, omit `--human`.
+
+Built-in public domains are `pigeoninbox.com` and `pigeonscale.email`. Pass `--domain` only when a specific built-in domain is required.
+
+The approval behavior depends on the human:
+
+- New human: bootstrap creates the mailbox immediately, starts a welcome window, mints a cloud session, and sends a separate approval email so the human can keep the mailbox after the welcome window. Use the mailbox right away.
+- Existing human: the same command becomes an approval flow. The CLI stores a local pending approval with a `reservedAddress` and `pendingToken`. Rerun the same `mail accounts create` command after approval to exchange it.
+
+Public handles do not become the final address verbatim. Pigeonscale appends digits, so expect addresses like `henry42@pigeoninbox.com`.
+
+## Additional mailbox workflows
+
+Create another public mailbox while already signed in:
+
+```bash
+pigeonscale mail accounts create \
+  --handle henry \
+  --from-name "Henry the Agent"
+```
+
+Use `--grants` only to prefill the approval UI when the needed scopes are known in advance:
+
+```bash
+pigeonscale mail accounts create \
+  --handle henry \
+  --from-name "Henry the Agent" \
+  --grants mailboxReadSend
+```
+
+## Custom domains
+
+Require login first for custom domains. Use `--username` and `--domain`; do not use `--handle`.
+
+```bash
+pigeonscale auth login --human owner@example.com
+
+pigeonscale mail accounts create \
+  --username henry \
+  --domain mail.example.com \
+  --from-name "Henry the Agent"
+```
+
+If the custom-domain create path prints `Approval required`, rerun the same command after approval so the CLI can exchange the stored pending token and persist the final mailbox.
+
+## Common follow-up commands
+
+```bash
+pigeonscale mail send --account henry42@pigeoninbox.com --to client@example.com --subject "Hello" --body "Hi"
+pigeonscale mail list --account henry42@pigeoninbox.com --unread
+pigeonscale mail watch --account henry42@pigeoninbox.com
+```
+
+## Approval edge cases
+
+- If output says `Approval still pending`, wait for the human to act and rerun the same command.
+- If output says `Approval denied`, stop and request a new approval instead of guessing.
+- If output says `Approval token invalid/expired`, rerun the original command to create a fresh approval.
+- A denied public mailbox reservation goes into cooldown, so do not promise that the same exact address will still be available later.
+
+## Constraints
+
+- Do not use `--provider resend` for Pigeonscale-hosted mailboxes.
+- Do not use `PIGEONSCALE_API_KEY=psp_live_*`; platform mode disables `mail accounts create`.
+- Prefer `--handle` unless the user explicitly needs a custom domain.
+- Do not invent approval success. Exchange only after the human acts.
