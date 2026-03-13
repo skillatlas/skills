@@ -532,15 +532,6 @@ async function releaseScheduledLock(): Promise<void> {
   await rm(SCHEDULED_LOCK_PATH, { force: true });
 }
 
-async function maybeWaitForScheduledJitter(scheduled: boolean): Promise<void> {
-  if (!scheduled || process.env.SKILLATLAS_NO_RANDOM_DELAY === "1") {
-    return;
-  }
-
-  const delayMs = Math.floor(Math.random() * 5 * 60 * 1000);
-  await new Promise((resolve) => setTimeout(resolve, delayMs));
-}
-
 function getScopeEntries(registry: RegistryFile, scope?: Scope): RegistryInstall[] {
   if (!scope) {
     return registry.installs;
@@ -642,7 +633,6 @@ Description=Run Skill Atlas auto-update every ${SCHEDULER_INTERVAL_HOURS} hours
 [Timer]
 OnBootSec=5m
 OnUnitActiveSec=${SCHEDULER_INTERVAL_HOURS}h
-RandomizedDelaySec=5m
 Unit=${SCHEDULER_NAME}.service
 
 [Install]
@@ -773,7 +763,6 @@ export async function runManagedUpdate(args: string[], runSkills: RunSkills): Pr
   const options = parseUpdateOptions(args);
 
   if (options.scheduled) {
-    await maybeWaitForScheduledJitter(true);
     const acquired = await acquireScheduledLock();
 
     if (!acquired) {
