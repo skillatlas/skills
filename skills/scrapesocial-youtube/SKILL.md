@@ -6,7 +6,7 @@ prerequisites:
   - Scrape Creators API key
 metadata:
   author: Skill Atlas
-  version: "0.1.1"
+  version: "0.1.2"
   homepage: https://skillatlas.sh/
 ---
 
@@ -23,7 +23,7 @@ Use this skill to choose the right `scrapesocial` YouTube command quickly for Yo
 - Install the CLI once:
 
 ```bash
-npm install -g scrapesocial
+npm install -g scrapesocial@0.1.0
 ```
 
 - Ensure authentication is available with `SCRAPECREATORS_API_KEY` or `--api-key`.

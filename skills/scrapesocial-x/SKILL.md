@@ -6,7 +6,7 @@ prerequisites:
   - Scrape Creators API key
 metadata:
   author: Skill Atlas
-  version: "0.1.1"
+  version: "0.1.2"
   homepage: https://skillatlas.sh/
 ---
 
@@ -23,7 +23,7 @@ Use this skill for read-only X research on known handles, posts, and communities
 - Install the CLI once:
 
 ```bash
-npm install -g scrapesocial
+npm install -g scrapesocial@0.1.0
 ```
 
 - Make sure auth is set up with `SCRAPECREATORS_API_KEY` or `--api-key`.

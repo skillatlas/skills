@@ -1,12 +1,12 @@
 ---
-name: movie-poster-style-image-generation
+name: movie-poster-graphics
 description: Create generative movie-poster style graphics for products, apps, brands, campaigns, and abstract concepts. Use when a task needs poster-quality key art, archetype selection, title treatment guidance, or strong prompting for an image model.
 license: MIT
 prerequisites:
   - OpenRouter API key
 metadata:
   author: Skill Atlas
-  version: "0.1.1"
+  version: "0.1.0"
   homepage: https://skillatlas.sh/
 ---
 
@@ -84,7 +84,7 @@ A strong poster usually has **one big visual idea**.
 
 The biggest risk in poster design is being predictable. An AI coding tool gets a poster with a glowing terminal. A security product gets a shield. A speed product gets lightning bolts. These are **dead on arrival** — they're the visual equivalent of clip art.
 
-The first idea you think of is the first idea _everyone_ thinks of. It is a cliché. But the problem is deeper than that: the _second_ idea is often just the first idea wearing a hat. You need to push past the gravitational pull of the obvious multiple times before you reach something genuinely interesting.
+The first idea you think of is the first idea *everyone* thinks of. It is a cliché. But the problem is deeper than that: the *second* idea is often just the first idea wearing a hat. You need to push past the gravitational pull of the obvious multiple times before you reach something genuinely interesting.
 
 Every poster job **must** go through this full process before any prompt is written. **All steps must be written out explicitly** — do not skip ahead, do not do this silently.
 
@@ -156,7 +156,7 @@ You now have two live candidates (the second and third concepts). Evaluate them 
 
 **Pick the strongest.** If one clearly wins, use it.
 
-If neither fully satisfies you — if both have strengths but neither is _the one_ — you have one more move: create a **fourth and final concept**. This can be:
+If neither fully satisfies you — if both have strengths but neither is *the one* — you have one more move: create a **fourth and final concept**. This can be:
 
 - A completely fresh idea informed by everything you've rejected
 - A synthesis that combines the strongest elements from Rounds 2 and 3

@@ -7,6 +7,7 @@ import { createHash } from "node:crypto";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { homedir, tmpdir } from "node:os";
 import { Command } from "commander";
+import updateNotifier from "update-notifier";
 import {
   MANAGED_INDEX_URL,
   MANAGED_SKILL_REPO,
@@ -18,7 +19,7 @@ import {
 
 const SEARCH_API_BASE = process.env.SKILLS_API_URL || "https://skills.sh";
 const require = createRequire(import.meta.url);
-const packageJson = require("../package.json") as { version: string };
+const packageJson = require("../package.json") as { name: string; version: string };
 let DEBUG_MODE = false;
 
 type SearchApiSkill = {
@@ -953,12 +954,32 @@ function createProgram(): Command {
   return program;
 }
 
+function notifyIfUpdateAvailable(): void {
+  const notifier = updateNotifier({ pkg: packageJson });
+
+  if (!notifier.update) {
+    return;
+  }
+
+  const isNpx = process.env.npm_config_user_agent?.includes("npx");
+
+  if (isNpx) {
+    console.error(
+      `${packageJson.name}@${packageJson.version} is out of date, run \`npx ${packageJson.name}@latest\` instead`
+    );
+    return;
+  }
+
+  notifier.notify();
+}
+
 async function main(): Promise<void> {
   const globalOptions = parseGlobalOptions(process.argv.slice(2));
   const args = globalOptions.args;
   const firstArg = args[0];
   const program = createProgram();
   DEBUG_MODE = globalOptions.debug;
+  notifyIfUpdateAvailable();
 
   if (!firstArg || firstArg === "-h" || firstArg === "--help" || firstArg === "help" || firstArg === "-V" || firstArg === "--version") {
     await program.parseAsync(process.argv);

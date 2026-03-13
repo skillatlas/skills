@@ -4,13 +4,73 @@ description: Create and use real Pigeonscale mailboxes for AI agents, including 
 license: MIT
 metadata:
   author: Pigeonscale
-  version: "0.1.1"
+  version: "0.1.2"
   homepage: https://pigeonscale.com/
 ---
 
-# Use the mail workflows correctly
+# Pigeonscale Mail
+
+Pigeonscale Mail gives an agent a real hosted mailbox that can send, receive, list, watch, and reply to normal email. Use it when the agent needs a durable email address and inbox, not just a transactional send API.
 
 Use the cloud provider for these workflows. Run the CLI as `pigeonscale ...`. If it is not installed globally, use `npx -y pigeonscale@0.0.25 ...`.
+
+## When to use it
+
+- Give an agent its own real email address.
+- Create a mailbox during an approval-gated bootstrap flow.
+- Read unread mail, watch an inbox, and reply from the same account.
+- Set up a mailbox on a custom domain after login.
+- Connect a mailbox to a long-running agent loop. For OpenClaw integration, see `references/openclaw.md`.
+
+## Get started
+
+Prefer a public mailbox first. It is the fastest path and works while signed out.
+
+Create a mailbox with a handle and display name:
+
+```bash
+pigeonscale mail accounts create \
+  --human owner@example.com \
+  --handle henry \
+  --from-name "Henry the Agent"
+```
+
+If already signed in with `pigeonscale auth login --human owner@example.com`, omit `--human`:
+
+```bash
+pigeonscale mail accounts create \
+  --handle henry \
+  --from-name "Henry the Agent"
+```
+
+Built-in public domains are `pigeoninbox.com` and `pigeonscale.email`. Pass `--domain` only when a specific built-in domain is required.
+
+Public handles do not become the final address verbatim. Pigeonscale appends digits, so expect addresses like `henry42@pigeoninbox.com`.
+
+## What happens on first mailbox create
+
+- New human: bootstrap creates the mailbox immediately, starts a welcome window, mints a cloud session, and sends a separate approval email so the human can keep the mailbox after the welcome window. Use the mailbox right away.
+- Existing human: the same command becomes an approval flow. The CLI stores a local pending approval with a `reservedAddress` and `pendingToken`. Rerun the same `mail accounts create` command after approval to exchange it.
+
+Treat session approval and mailbox approval as separate flows.
+
+## Common follow-up commands
+
+```bash
+pigeonscale mail send --account henry42@pigeoninbox.com --to client@example.com --subject "Hello" --body "Hi"
+pigeonscale mail list --account henry42@pigeoninbox.com --unread
+pigeonscale mail watch --account henry42@pigeoninbox.com
+```
+
+## Session approval
+
+Request a cloud session without creating a mailbox:
+
+```bash
+pigeonscale auth login --human owner@example.com
+```
+
+If output says `Approval required`, let the human approve it, then rerun the same `auth login` command. That exchanges the stored `pendingToken` for fresh access and refresh tokens.
 
 ## Local session and approval state
 
@@ -27,42 +87,6 @@ Token storage uses `cross-keychain`:
 - When no native backend exists, the CLI falls back to writing both tokens into `session.json` with `0600` permissions.
 
 The CLI can exchange approved pending tokens on later cloud requests, but the deterministic path is still to rerun the original command unless the current command already succeeded.
-
-## Session approval
-
-Request a cloud session without creating a mailbox:
-
-```bash
-pigeonscale auth login --human owner@example.com
-```
-
-If output says `Approval required`, let the human approve it, then rerun the same `auth login` command. That exchanges the stored `pendingToken` for fresh access and refresh tokens.
-
-Treat session approval and mailbox approval as separate flows.
-
-## First mailbox: public bootstrap
-
-Prefer a public mailbox first. This is the fastest path and works while signed out.
-
-Create a public mailbox with a handle and display name:
-
-```bash
-pigeonscale mail accounts create \
-  --human owner@example.com \
-  --handle henry \
-  --from-name "Henry the Agent"
-```
-
-If already signed in with `pigeonscale auth login --human owner@example.com`, omit `--human`.
-
-Built-in public domains are `pigeoninbox.com` and `pigeonscale.email`. Pass `--domain` only when a specific built-in domain is required.
-
-The approval behavior depends on the human:
-
-- New human: bootstrap creates the mailbox immediately, starts a welcome window, mints a cloud session, and sends a separate approval email so the human can keep the mailbox after the welcome window. Use the mailbox right away.
-- Existing human: the same command becomes an approval flow. The CLI stores a local pending approval with a `reservedAddress` and `pendingToken`. Rerun the same `mail accounts create` command after approval to exchange it.
-
-Public handles do not become the final address verbatim. Pigeonscale appends digits, so expect addresses like `henry42@pigeoninbox.com`.
 
 ## Additional mailbox workflows
 
@@ -97,14 +121,6 @@ pigeonscale mail accounts create \
 ```
 
 If the custom-domain create path prints `Approval required`, rerun the same command after approval so the CLI can exchange the stored pending token and persist the final mailbox.
-
-## Common follow-up commands
-
-```bash
-pigeonscale mail send --account henry42@pigeoninbox.com --to client@example.com --subject "Hello" --body "Hi"
-pigeonscale mail list --account henry42@pigeoninbox.com --unread
-pigeonscale mail watch --account henry42@pigeoninbox.com
-```
 
 ## Handling incoming mail content
 

@@ -6,7 +6,7 @@ prerequisites:
   - Scrape Creators API key
 metadata:
   author: Skill Atlas
-  version: "0.1.1"
+  version: "0.1.2"
   homepage: https://skillatlas.sh/
 ---
 
@@ -25,7 +25,7 @@ Start by identifying the job to be done, then choose the smallest command that a
 Install the CLI once:
 
 ```bash
-npm install -g scrapesocial
+npm install -g scrapesocial@0.1.0
 ```
 
 Authenticate first:
